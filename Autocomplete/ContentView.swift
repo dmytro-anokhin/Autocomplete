@@ -8,9 +8,29 @@
 import SwiftUI
 
 struct ContentView: View {
+
+    @ObservedObject private var autocomplete = AutocompleteObject()
+
+    @State var input: String = ""
+
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack {
+            TextField("", text: $input)
+                .textFieldStyle(.roundedBorder)
+                .padding()
+                .onChange(of: input) { newValue in
+                    autocomplete.autocomplete(input)
+                }
+        }
+        List(autocomplete.suggestions, id: \.self) { suggestion in
+            ZStack {
+                Text(suggestion)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .onTapGesture {
+                input = suggestion
+            }
+        }
     }
 }
 
