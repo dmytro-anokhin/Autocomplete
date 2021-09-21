@@ -21,10 +21,10 @@ final class AutocompleteObject: ObservableObject {
 
     private var autocompleteTask: Task<Void, Never>?
 
-    private let autocompleteActor = AutocompleteCityActor(delay: 1.0)
+    private let autocompleteActor = CitiesAutocomplete(delay: 1.0)
 
     func autocomplete(_ text: String) {
-        guard !isEmptyOrAlreadySuggested(text) else { // Check if text is empty or current suggestions already contain it
+        guard !text.isEmpty else { // Check if text is empty or current suggestions already contain it
             suggestions = []
             autocompleteTask?.cancel()
             return
@@ -47,10 +47,6 @@ final class AutocompleteObject: ObservableObject {
         }
     }
 
-    private func isEmptyOrAlreadySuggested(_ text: String) -> Bool {
-        text.isEmpty || suggestions.contains(text)
-    }
-
     private func isSuggestion(in suggestions: [String], equalTo text: String) -> Bool {
         guard let suggestion = suggestions.first, suggestions.count == 1 else {
             return false
@@ -60,7 +56,7 @@ final class AutocompleteObject: ObservableObject {
     }
 }
 
-actor AutocompleteCityActor {
+actor CitiesAutocomplete {
 
     let delay: TimeInterval
 
@@ -70,6 +66,7 @@ actor AutocompleteCityActor {
 
     func autocomplete(_ text: String) async -> [String] {
         await Task.sleep(UInt64(delay * 1_000_000_000.0))
+        print(Thread.current)
         return Task.isCancelled ? [] : await performAutocomplete(text)
     }
 
