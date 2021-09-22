@@ -21,7 +21,7 @@ final class AutocompleteObject: ObservableObject {
 
     private var autocompleteTask: Task<Void, Never>?
 
-    private let autocompleteActor = CitiesAutocomplete(delay: 1.0)
+    private let citiesCache = CitiesCache()
 
     func autocomplete(_ text: String) {
         guard !text.isEmpty else { // Check if text is empty or current suggestions already contain it
@@ -34,7 +34,14 @@ final class AutocompleteObject: ObservableObject {
         autocompleteTask?.cancel()
 
         autocompleteTask = Task {
-            let newSuggestions = await autocompleteActor.autocomplete(text)
+            await Task.sleep(UInt64(0.3 * 1_000_000_000.0))
+
+            guard !Task.isCancelled else {
+                print("cancel autocomplete for: \(text)")
+                return
+            }
+
+            let newSuggestions = await citiesCache.lookup(prefix: text)
 
             if isSuggestion(in: suggestions, equalTo: text) {
                 // Do not offer only one suggestion same as the input
@@ -53,27 +60,5 @@ final class AutocompleteObject: ObservableObject {
         }
 
         return suggestion.lowercased() == text.lowercased()
-    }
-}
-
-actor CitiesAutocomplete {
-
-    let delay: TimeInterval
-
-    init(delay: TimeInterval) {
-        self.delay = delay
-    }
-
-    func autocomplete(_ text: String) async -> [String] {
-        await Task.sleep(UInt64(delay * 1_000_000_000.0))
-        print(Thread.current)
-        return Task.isCancelled ? [] : await performAutocomplete(text)
-    }
-
-    private let cache = CitiesCache()
-
-    private func performAutocomplete(_ text: String) async -> [String] {
-        let prefix = text.lowercased()
-        return await cache.cities.filter { $0.lowercased().hasPrefix(prefix) }
     }
 }

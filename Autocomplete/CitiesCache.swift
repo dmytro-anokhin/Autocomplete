@@ -11,19 +11,23 @@ import Foundation
 actor CitiesCache {
 
     var cities: [String] {
-        if let cities = cachedCities {
+        get async {
+            print("cities: \(Thread.current)")
+
+            if let cities = cachedCities {
+                return cities
+            }
+
+            let cities = await loadCities()
+            cachedCities = cities
+
             return cities
         }
-
-        let cities = loadCities()
-        cachedCities = cities
-
-        return cities
     }
 
     private var cachedCities: [String]?
 
-    private func loadCities() -> [String] {
+    private func loadCities() async -> [String] {
         guard let location = Bundle.main.url(forResource: "cities", withExtension: nil) else {
             assertionFailure("cities file is not in the main bundle")
             return []
@@ -44,5 +48,14 @@ actor CitiesCache {
             print(error)
             return []
         }
+    }
+}
+
+
+extension CitiesCache {
+
+    func lookup(prefix: String) async -> [String] {
+        let lowercasedPrefix = prefix.lowercased()
+        return await cities.filter { $0.lowercased().hasPrefix(lowercasedPrefix) }
     }
 }
