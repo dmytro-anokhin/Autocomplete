@@ -36,16 +36,9 @@ actor CitiesCache {
         do {
             let data = try Data(contentsOf: location)
             let string = String(data: data, encoding: .utf8)
-
-            guard let cities = string?.components(separatedBy: .newlines), !cities.isEmpty else {
-                assertionFailure("Can not parse cities file")
-                return []
-            }
-
-            return cities
+            return string?.components(separatedBy: .newlines) ?? []
         }
         catch {
-            print(error)
             return []
         }
     }
