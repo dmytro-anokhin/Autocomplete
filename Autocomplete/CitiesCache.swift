@@ -12,8 +12,6 @@ actor CitiesCache {
 
     var cities: [String] {
         get async {
-            print("cities: \(Thread.current)")
-
             if let cities = cachedCities {
                 return cities
             }

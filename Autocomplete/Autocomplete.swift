@@ -37,7 +37,6 @@ final class AutocompleteObject: ObservableObject {
             await Task.sleep(UInt64(0.3 * 1_000_000_000.0))
 
             guard !Task.isCancelled else {
-                print("cancel autocomplete for: \(text)")
                 return
             }
 
