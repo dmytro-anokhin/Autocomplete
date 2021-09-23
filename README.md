@@ -8,7 +8,7 @@ Before we start here is the problem. Say we have an app that can show informatio
 
 <img src="https://user-images.githubusercontent.com/5136301/134250533-0c20f55c-b1b2-4b0b-9d57-8036d77cfb4b.png" data-canonical-src="https://user-images.githubusercontent.com/5136301/134250533-0c20f55c-b1b2-4b0b-9d57-8036d77cfb4b.png" width="375"/>
 
-Suggestions can come from a server or bundled with the app. For simplicity we store suggestions in a plain text file (`cities`), separated by newline.
+Suggestions can come from a server or bundled with the app. For simplicity, in the example we store suggestions as a plain text (`cities` file), where each city name separated by newline.
 
 ```
 ...
@@ -19,32 +19,33 @@ Amstetten
 ...
 ```
 
-First, let's build the `CitiesCache` object to load the file in memory.
+To load the file in memory we use `CitiesSource` protocol and `CitiesFile` object that implements it. You may choose not to declare a protocol, but I find it a nice and simple separation, useful for unit testing.
 
 ```swift
-actor CitiesCache {
+protocol CitiesSource {
 
-    var cities: [String] {
-        get async {
-            if let cities = cachedCities {
-                return cities
-            }
+    func loadCities() -> [String]
+}
 
-            let cities = loadCities()
-            cachedCities = cities
+struct CitiesFile: CitiesSource {
 
-            return cities
-        }
+    let location: URL
+
+    init(location: URL) {
+        self.location = location
     }
 
-    private var cachedCities: [String]?
-
-    private func loadCities() -> [String] {
+    /// Looks up for `cities` file in the main bundle
+    init?() {
         guard let location = Bundle.main.url(forResource: "cities", withExtension: nil) else {
             assertionFailure("cities file is not in the main bundle")
-            return []
+            return nil
         }
 
+        self.init(location: location)
+    }
+
+    func loadCities() -> [String] {
         do {
             let data = try Data(contentsOf: location)
             let string = String(data: data, encoding: .utf8)
@@ -53,6 +54,40 @@ actor CitiesCache {
         catch {
             return []
         }
+    }
+}
+```
+
+Let's talk about caching. A good cache is thread safe. Cache is where `async/await` comes to life. 
+
+`CitiesCache` loads and stores cities in memory. `CitiesCache` is an actor. [Actor](https://github.com/apple/swift-evolution/blob/main/proposals/0306-actors.md) protects its own data, ensuring that only a single thread will access that data at a given time. Precisely what we need for a cache.
+
+```swift
+actor CitiesCache {
+
+    let source: CitiesSource
+
+    init(source: CitiesSource) {
+        self.source = source
+    }
+
+    var cities: [String] {
+        if let cities = cachedCities {
+            return cities
+        }
+
+        let cities = source.loadCities()
+        cachedCities = cities
+
+        return cities
+    }
+
+    private var cachedCities: [String]?
+
+    func lookup(prefix: String) async -> [String] {
+        print("lookup thread: \(Thread.current)")
+        let lowercasedPrefix = prefix.lowercased()
+        return cities.filter { $0.lowercased().hasPrefix(lowercasedPrefix) }
     }
 }
 
