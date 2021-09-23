@@ -65,10 +65,6 @@ actor CitiesCache {
     }
 
     private var cachedCities: [String]?
-}
-
-
-extension CitiesCache {
 
     func lookup(prefix: String) async -> [String] {
         print("lookup thread: \(Thread.current)")
