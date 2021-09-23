@@ -9,7 +9,7 @@ import Foundation
 
 protocol CitiesSource {
 
-    func loadCities() async -> [String]
+    func loadCities() -> [String]
 }
 
 struct CitiesFile: CitiesSource {
@@ -30,7 +30,7 @@ struct CitiesFile: CitiesSource {
         self.init(location: location)
     }
 
-    func loadCities() async -> [String] {
+    func loadCities() -> [String] {
         print("load cities thread: \(Thread.current)")
         do {
             let data = try Data(contentsOf: location)
@@ -52,16 +52,14 @@ actor CitiesCache {
     }
 
     var cities: [String] {
-        get async {
-            if let cities = cachedCities {
-                return cities
-            }
-
-            let cities = await source.loadCities()
-            cachedCities = cities
-
+        if let cities = cachedCities {
             return cities
         }
+
+        let cities = source.loadCities()
+        cachedCities = cities
+
+        return cities
     }
 
     private var cachedCities: [String]?
@@ -69,6 +67,6 @@ actor CitiesCache {
     func lookup(prefix: String) async -> [String] {
         print("lookup thread: \(Thread.current)")
         let lowercasedPrefix = prefix.lowercased()
-        return await cities.filter { $0.lowercased().hasPrefix(lowercasedPrefix) }
+        return cities.filter { $0.lowercased().hasPrefix(lowercasedPrefix) }
     }
 }
