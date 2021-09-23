@@ -21,7 +21,7 @@ final class AutocompleteObject: ObservableObject {
 
     private var autocompleteTask: Task<Void, Never>?
 
-    private let citiesCache = CitiesCache()
+    private let citiesCache = CitiesCache(source: CitiesFile()!)
 
     func autocomplete(_ text: String) {
         guard !text.isEmpty else { // Check if text is empty or current suggestions already contain it
