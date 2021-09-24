@@ -63,10 +63,25 @@ actor CitiesCache {
     }
 
     private var cachedCities: [String]?
+}
 
-    func lookup(prefix: String) async -> [String] {
+extension CitiesCache {
+
+    func lookup(prefix: String) -> [String] {
         print("lookup thread: \(Thread.current)")
-        let lowercasedPrefix = prefix.lowercased()
-        return cities.filter { $0.lowercased().hasPrefix(lowercasedPrefix) }
+        return cities.filter { $0.hasCaseAndDiacriticInsensitivePrefix(prefix) }
+    }
+}
+
+
+extension String {
+
+    /// "krako" is a prefix of "Kraków"
+    func hasCaseAndDiacriticInsensitivePrefix(_ prefix: String) -> Bool {
+        guard let range = self.range(of: prefix, options: [.caseInsensitive, .diacriticInsensitive]) else {
+            return false
+        }
+
+        return range.lowerBound == startIndex
     }
 }
