@@ -1,19 +1,18 @@
-# SwiftUI autocomplete using async/await and actors
+# Autocomplete for SwiftUI using async/await and actors
 
 With [Swift 5.5 released](https://swift.org/blog/swift-5-5-released/) I want to offer a look how new [concurrency](https://docs.swift.org/swift-book/LanguageGuide/Concurrency.html) model can be used to create autocomplete feature in SwiftUI.
 
-// I assume you already know what async/await is. We will focus on how to use it in practice.
-// [async/await](https://github.com/apple/swift-evolution/blob/main/proposals/0296-async-await.md)
-
 ---
 
-Before we start, here is the problem: we have an app that can show information about a city; user types city in a `TextField` and we want to offer autocomplete suggestions.
+Text autocomplete is a common feature that typically involves database lookup or networking. This operations must be asynchronous, not to block user input, and can include in-memory cache to speedup repeated lookups. This usecase is perfect to battle test new Swift concurrency model.
+
+Let's say we have an app that can show information about a city. When user types city in a `TextField` and we want to offer autocomplete suggestions.
 
 This is our UI.
 
 <img src="https://user-images.githubusercontent.com/5136301/134250533-0c20f55c-b1b2-4b0b-9d57-8036d77cfb4b.png" data-canonical-src="https://user-images.githubusercontent.com/5136301/134250533-0c20f55c-b1b2-4b0b-9d57-8036d77cfb4b.png" width="375"/>
 
-SwiftUI code hardcodes suggestions for a prototype. Our goal is to make it work.
+Here is SwiftUI code that hardcodes suggestions for a prototype.
 
 ```swift
 struct ContentView: View {
@@ -61,7 +60,6 @@ protocol CitiesSource {
 
 struct CitiesFile: CitiesSource {
 
-    /// Location of the file to load
     let location: URL
 
     init(location: URL) {
@@ -199,7 +197,7 @@ final class AutocompleteObject: ObservableObject {
 
 ---
 
-The final solution looks this.
+Inside the view we create `AutocompleteObject` and observe its `suggestions` property. When `input` changes we call `autocomplete` function and the property will update.
 
 ```swift
 struct ContentView: View {
