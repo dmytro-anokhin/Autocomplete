@@ -12,29 +12,28 @@ import Foundation
 @MainActor
 final class AutocompleteObject: ObservableObject {
 
-    @Published var isUpdating: Bool = false
+    let delay: TimeInterval = 0.3
 
     @Published var suggestions: [String] = []
 
     init() {
     }
 
-    private var autocompleteTask: Task<Void, Never>?
-
     private let citiesCache = CitiesCache(source: CitiesFile()!)
 
+    private var task: Task<Void, Never>?
+
     func autocomplete(_ text: String) {
-        guard !text.isEmpty else { // Check if text is empty or current suggestions already contain it
+        guard !text.isEmpty else {
             suggestions = []
-            autocompleteTask?.cancel()
+            task?.cancel()
             return
         }
 
-        isUpdating = true
-        autocompleteTask?.cancel()
+        task?.cancel()
 
-        autocompleteTask = Task {
-            await Task.sleep(UInt64(0.3 * 1_000_000_000.0))
+        task = Task {
+            await Task.sleep(UInt64(delay * 1_000_000_000.0))
 
             guard !Task.isCancelled else {
                 return
@@ -42,18 +41,16 @@ final class AutocompleteObject: ObservableObject {
 
             let newSuggestions = await citiesCache.lookup(prefix: text)
 
-            if isSuggestion(in: suggestions, equalTo: text) {
+            if isSingleSuggestion(suggestions, equalTo: text) {
                 // Do not offer only one suggestion same as the input
                 suggestions = []
             } else {
                 suggestions = newSuggestions
             }
-
-            isUpdating = false
         }
     }
 
-    private func isSuggestion(in suggestions: [String], equalTo text: String) -> Bool {
+    private func isSingleSuggestion(_ suggestions: [String], equalTo text: String) -> Bool {
         guard let suggestion = suggestions.first, suggestions.count == 1 else {
             return false
         }
