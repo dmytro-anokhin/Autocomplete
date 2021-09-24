@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F4B4879B26FDD325002A6B95 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B4879A26FDD325002A6B95 /* Utils.swift */; };
+		F4B4879D26FDD3C6002A6B95 /* CitiesFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B4879C26FDD3C6002A6B95 /* CitiesFile.swift */; };
 		F4FB5CA226FA7DD70023A0C1 /* AutocompleteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FB5CA126FA7DD70023A0C1 /* AutocompleteApp.swift */; };
 		F4FB5CA426FA7DD70023A0C1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FB5CA326FA7DD70023A0C1 /* ContentView.swift */; };
 		F4FB5CA626FA7DD90023A0C1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F4FB5CA526FA7DD90023A0C1 /* Assets.xcassets */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F4B4879A26FDD325002A6B95 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		F4B4879C26FDD3C6002A6B95 /* CitiesFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitiesFile.swift; sourceTree = "<group>"; };
 		F4FB5C9E26FA7DD70023A0C1 /* Autocomplete.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Autocomplete.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4FB5CA126FA7DD70023A0C1 /* AutocompleteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutocompleteApp.swift; sourceTree = "<group>"; };
 		F4FB5CA326FA7DD70023A0C1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -64,7 +68,9 @@
 				F4FB5CA126FA7DD70023A0C1 /* AutocompleteApp.swift */,
 				F4FB5CA326FA7DD70023A0C1 /* ContentView.swift */,
 				F4FB5CB126FA81D80023A0C1 /* CitiesCache.swift */,
+				F4B4879C26FDD3C6002A6B95 /* CitiesFile.swift */,
 				F4FB5CB326FA82CD0023A0C1 /* Autocomplete.swift */,
+				F4B4879A26FDD325002A6B95 /* Utils.swift */,
 				F4FB5CA526FA7DD90023A0C1 /* Assets.xcassets */,
 				F4FB5CA726FA7DD90023A0C1 /* Preview Content */,
 				F4FB5CB526FA83790023A0C1 /* cities */,
@@ -151,7 +157,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4B4879B26FDD325002A6B95 /* Utils.swift in Sources */,
 				F4FB5CA426FA7DD70023A0C1 /* ContentView.swift in Sources */,
+				F4B4879D26FDD3C6002A6B95 /* CitiesFile.swift in Sources */,
 				F4FB5CB226FA81D80023A0C1 /* CitiesCache.swift in Sources */,
 				F4FB5CA226FA7DD70023A0C1 /* AutocompleteApp.swift in Sources */,
 				F4FB5CB426FA82CD0023A0C1 /* Autocomplete.swift in Sources */,

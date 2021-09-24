@@ -5,52 +5,23 @@
 //  Created by Dmytro Anokhin on 21/09/2021.
 //
 
-import Foundation
-
+/// The source of all city names
 protocol CitiesSource {
 
     func loadCities() -> [String]
 }
 
-struct CitiesFile: CitiesSource {
-
-    let location: URL
-
-    init(location: URL) {
-        self.location = location
-    }
-
-    /// Looks up for `cities` file in the main bundle
-    init?() {
-        guard let location = Bundle.main.url(forResource: "cities", withExtension: nil) else {
-            assertionFailure("cities file is not in the main bundle")
-            return nil
-        }
-
-        self.init(location: location)
-    }
-
-    func loadCities() -> [String] {
-        print("load cities thread: \(Thread.current)")
-        do {
-            let data = try Data(contentsOf: location)
-            let string = String(data: data, encoding: .utf8)
-            return string?.components(separatedBy: .newlines) ?? []
-        }
-        catch {
-            return []
-        }
-    }
-}
-
+/// The `CitiesCache` object manages the list of city names loaded from an external source.
 actor CitiesCache {
 
+    /// Source to load city names.
     let source: CitiesSource
 
     init(source: CitiesSource) {
         self.source = source
     }
 
+    /// The list of city names.
     var cities: [String] {
         if let cities = cachedCities {
             return cities
@@ -67,21 +38,14 @@ actor CitiesCache {
 
 extension CitiesCache {
 
+    /// Returns a list of city names filtered using given prefix.
+    ///
+    /// Lookup is case insensitive and diacritic insensitive:
+    ///     "ams" will return ["Amstelveen", "Amsterdam", "Amsterdam-Zuidoost", "Amstetten"]
+    ///     "krako" will return ["Kraków"]
+    ///
+    /// Lookup is a linear time operation.
     func lookup(prefix: String) -> [String] {
-        print("lookup thread: \(Thread.current)")
-        return cities.filter { $0.hasCaseAndDiacriticInsensitivePrefix(prefix) }
-    }
-}
-
-
-extension String {
-
-    /// "krako" is a prefix of "Kraków"
-    func hasCaseAndDiacriticInsensitivePrefix(_ prefix: String) -> Bool {
-        guard let range = self.range(of: prefix, options: [.caseInsensitive, .diacriticInsensitive]) else {
-            return false
-        }
-
-        return range.lowerBound == startIndex
+        cities.filter { $0.hasCaseAndDiacriticInsensitivePrefix(prefix) }
     }
 }

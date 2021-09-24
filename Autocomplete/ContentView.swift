@@ -9,8 +9,10 @@ import SwiftUI
 
 struct ContentView: View {
 
+    /// Autocompletion for the input text
     @ObservedObject private var autocomplete = AutocompleteObject()
 
+    /// Input text in the text field
     @State var input: String = ""
 
     var body: some View {
